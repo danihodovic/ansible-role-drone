@@ -1,0 +1,30 @@
+---
+- name: Install docker-py
+  pip:
+    name: docker
+
+- name: Deploy worker
+  docker_container:
+    comparisons:
+      '*': strict
+    image: '{{ drone_worker_image }}'
+    name: '{{ drone_container_name }}-worker'
+    restart_policy: unless-stopped
+    memory: '{{ drone_worker_memory }}'
+    cpu_shares: '{{ drone_worker_cpu }}'
+    networks: '{{ drone_docker_networks|default(omit) }}'
+    env: '{{ drone_env }}'
+    ports: '{{ drone_worker_ports }}'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+- name: Wait for health check
+  uri:
+    method: GET
+    url: http://localhost:3000/healthz
+    status_code: 200
+    timeout: 5
+  register: health_check_worker
+  retries: 10
+  delay: 1
+  until: health_check_worker.status == 200

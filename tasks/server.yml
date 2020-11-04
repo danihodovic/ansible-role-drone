@@ -1,0 +1,34 @@
+---
+- assert:
+    that:
+      - drone_env is defined
+
+- name: Install docker-py
+  pip:
+    name: docker
+
+- name: Deploy web
+  docker_container:
+    comparisons:
+      '*': strict
+    image: '{{ drone_web_image }}'
+    name: '{{ drone_container_name }}-web'
+    restart_policy: unless-stopped
+    memory: '{{ drone_web_memory }}'
+    cpu_shares: '{{ drone_web_cpu }}'
+    networks: '{{ drone_docker_networks|default(omit) }}'
+    env: '{{ drone_env }}'
+    ports: '{{ drone_web_ports }}'
+    volumes:
+      - '{{ drone_data_dir }}:/data'
+
+- name: Wait for health check
+  uri:
+    method: GET
+    url: http://localhost/healthz
+    status_code: 200
+    timeout: 5
+  register: health_check_server
+  retries: 10
+  delay: 1
+  until: health_check_server.status == 200
