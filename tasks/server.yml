@@ -3,9 +3,7 @@
     that:
       - drone_env is defined
 
-- name: Install docker-py
-  pip:
-    name: docker
+- include_tasks: ./install_dependencies.yml
 
 - name: Deploy web
   docker_container:
