@@ -1,6 +1,4 @@
-![logo](./logo.png)
-
-# ansible-role-drone
+# ansible-role-drone [![Build Status](https://ci.depode.com/api/badges/danihodovic/ansible-role-drone/status.svg)](https://ci.depode.com/danihodovic/ansible-role-drone)
 
 Deploys [Drone CI](https://drone.io/)
 
