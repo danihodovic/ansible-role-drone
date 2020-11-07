@@ -7,12 +7,12 @@ platforms:
   - name: drone-web
     region: fra1
     size: 2gb
-    image: ubuntu-20-04-x64
+    image: docker-20-04
     groups: [drone_web]
   - name: drone-worker
     region: fra1
     size: 2gb
-    image: ubuntu-20-04-x64
+    image: docker-20-04
     groups: [drone_worker]
 provisioner:
   name: ansible
@@ -28,3 +28,17 @@ provisioner:
 verifier:
   name: testinfra
   directory: ../../tests
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

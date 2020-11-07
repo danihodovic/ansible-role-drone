@@ -7,6 +7,7 @@ def test_server_running(host):
     result = host.run("curl localhost/healthz -s")
     assert result.exit_status == 0
 
+
 def test_worker_running(host):
     if host.backend.get_hostname() != "drone-worker":
         pytest.skip()

@@ -1,0 +1,11 @@
+---
+- name: Wait for health check
+  uri:
+    method: GET
+    url: http://localhost:3000/healthz
+    status_code: 200
+    timeout: 5
+  register: health_check_worker
+  retries: 10
+  delay: 1
+  until: health_check_worker.status == 200

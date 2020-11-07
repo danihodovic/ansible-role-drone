@@ -2,31 +2,45 @@
 - name: Deploy web
   hosts: drone_web
   tasks:
+    - name: Create a record for oauth login
+      community.general.cloudflare_dns:
+        zone: ipdop.com
+        record: drone-testing-molecule
+        type: A
+        value: '{{ ansible_default_ipv4.address }}'
+        account_api_key: '{{ lookup("env", "CF_API_KEY") }}'
+        account_email: '{{ lookup("env", "CF_API_EMAIL") }}'
+
     - name: Install drone web
-      include_role:
+      import_role:
         name: ansible-role-drone
         tasks_from: server.yml
       vars:
         drone_env:
-          DRONE_SERVER_HOST: drone.ipdop.com
+          DRONE_SERVER_HOST: drone-testing-molecule.ipdop.com
           DRONE_SERVER_PORT: ':80'
           DRONE_SERVER_PROTO: http
           DRONE_GITLAB_CLIENT_ID: '{{ lookup("env", "GITLAB_CLIENT_ID") }}'
           DRONE_GITLAB_CLIENT_SECRET: '{{ lookup("env", "GITLAB_CLIENT_SECRET") }}'
-          DRONE_RPC_HOST: drone.ipdop.com
+          DRONE_RPC_HOST: '{{ ansible_all_ipv4_addresses | ipaddr("10.0.0.0/8") | max }}'
           DRONE_RPC_PROTO: http
           DRONE_RPC_SECRET: very-secret
 
 - name: Deploy worker
   hosts: drone_worker
   tasks:
+    - name: Gather facts drone web
+      ansible.builtin.setup:
+      delegate_to: drone-web
+      delegate_facts: true
+
     - name: Install drone worker
-      include_role:
+      import_role:
         name: ansible-role-drone
         tasks_from: worker.yml
       vars:
         drone_env:
-          DRONE_RPC_HOST: drone.ipdop.com
+          DRONE_RPC_HOST: '{{ hostvars["drone-web"].ansible_all_ipv4_addresses | ipaddr("10.0.0.0/8") | max }}'
           DRONE_RPC_PROTO: http
           DRONE_RPC_SECRET: very-secret
           DRONE_RUNNER_CAPACITY: '1'
