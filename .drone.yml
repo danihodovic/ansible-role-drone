@@ -3,6 +3,11 @@ kind: pipeline
 type: docker
 name: default
 
+volumes:
+  - name: cache
+    host:
+      path: /tmp/cache-ansible-role-drone
+
 steps:
   - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:dev
@@ -62,7 +67,8 @@ steps:
     - name: cache
       path: /tmp/cache
 
-volumes:
-  - name: cache
-    host:
-      path: /tmp/cache-ansible-role-drone
+  - name: fail-on-debug-instruction
+    image: alpine
+    commands:
+      - grep '|| sleep' .drone.yml || exit 1
+
