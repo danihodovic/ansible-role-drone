@@ -2,13 +2,16 @@
 drone_web_image: drone/drone:1
 drone_worker_image: drone/drone-runner-docker:1
 drone_container_name: drone
+drone_web_container_name: '{{ drone_container_name }}-web'
+drone_worker_container_name: '{{ drone_container_name }}-worker'
 drone_data_dir: /opt/drone
 drone_server_proto: https
 drone_web_memory: '{{ ansible_memory_mb.real.total * 0.8 }}m'
 drone_web_cpu: '{{ (1024 * 0.8) | int }}'
 drone_worker_memory: '{{ ansible_memory_mb.real.total * 0.8 }}m'
 drone_worker_cpu: '{{ (1024 * 0.8) | int }}'
-drone_docker_networks: [{name: bridge}]
+drone_web_docker_networks: [{name: bridge}]
+drone_worker_docker_networks: [{name: bridge}]
 
 drone_web_ports:
   - '80:80'
