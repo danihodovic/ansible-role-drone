@@ -1,16 +1,19 @@
 ---
 - include_tasks: ./install_dependencies.yml
 
+- include_tasks: ./create_docker_network.yml
+  loop: '{{ drone_worker_docker_networks }}'
+
 - name: Deploy worker
   docker_container:
     comparisons:
       '*': strict
     image: '{{ drone_worker_image }}'
-    name: '{{ drone_container_name }}-worker'
+    name: '{{ drone_worker_container_name }}'
     restart_policy: unless-stopped
     memory: '{{ drone_worker_memory }}'
     cpu_shares: '{{ drone_worker_cpu }}'
-    networks: '{{ drone_docker_networks|default(omit) }}'
+    networks: '{{ drone_worker_docker_networks|default(omit) }}'
     env: '{{ drone_env }}'
     ports: '{{ drone_worker_ports }}'
     volumes:

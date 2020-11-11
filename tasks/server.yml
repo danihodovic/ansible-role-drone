@@ -5,28 +5,30 @@
 
 - include_tasks: ./install_dependencies.yml
 
+- include_tasks: ./create_docker_network.yml
+  loop: '{{ drone_worker_docker_networks }}'
+
 - name: Deploy web
+  register: start_drone_container
   docker_container:
     comparisons:
       '*': strict
     image: '{{ drone_web_image }}'
-    name: '{{ drone_container_name }}-web'
+    name: '{{ drone_web_container_name }}'
     restart_policy: unless-stopped
     memory: '{{ drone_web_memory }}'
     cpu_shares: '{{ drone_web_cpu }}'
-    networks: '{{ drone_docker_networks|default(omit) }}'
+    networks: '{{ drone_web_docker_networks|default(omit) }}'
     env: '{{ drone_env }}'
     ports: '{{ drone_web_ports }}'
     volumes:
       - '{{ drone_data_dir }}:/data'
 
-- name: Wait for health check
-  uri:
-    method: GET
-    url: http://localhost/healthz
-    status_code: 200
-    timeout: 5
-  register: health_check_server
-  retries: 10
+- name: Wait for Drone to start
+  register: health_check_result
+  shell: >-
+    docker run --net=container:{{ drone_web_container_name }}
+    alpine/httpie --check-status http://{{ drone_web_container_name }}/healthz
+  retries: 30
   delay: 1
-  until: health_check_server.status == 200
+  until: health_check_result.rc == 0
