@@ -10,8 +10,8 @@ drone_web_memory: '{{ ansible_memory_mb.real.total * 0.8 }}m'
 drone_web_cpu: '{{ (1024 * 0.8) | int }}'
 drone_worker_memory: '{{ ansible_memory_mb.real.total * 0.8 }}m'
 drone_worker_cpu: '{{ (1024 * 0.8) | int }}'
-drone_web_docker_networks: [{name: bridge}]
-drone_worker_docker_networks: [{name: bridge}]
+drone_web_docker_networks: [{name: drone}]
+drone_worker_docker_networks: [{name: drone}]
 
 drone_web_ports:
   - '80:80'
