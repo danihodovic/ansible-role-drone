@@ -2,6 +2,7 @@
 - name: Deploy web
   hosts: drone_web
   tasks:
+    # TODO: Remove this after runs
     - name: Create a record for oauth login
       community.general.cloudflare_dns:
         zone: ipdop.com

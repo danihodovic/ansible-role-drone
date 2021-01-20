@@ -53,7 +53,6 @@
     - name: Create molecule instance(s)
       community.digitalocean.digital_ocean_droplet:
         name: "{{ item.name }}"
-        unique_name: true
         region: "{{ item.region }}"
         image: "{{ item.image }}"
         size: "{{ item.size }}"

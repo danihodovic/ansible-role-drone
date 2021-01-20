@@ -1,9 +1,6 @@
 ---
 - include_tasks: ./install_dependencies.yml
 
-- include_tasks: ./create_docker_network.yml
-  loop: '{{ drone_worker_docker_networks }}'
-
 - name: Deploy worker
   docker_container:
     comparisons:
