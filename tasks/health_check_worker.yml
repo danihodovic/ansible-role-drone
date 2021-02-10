@@ -1,9 +1,0 @@
----
-- name: Wait for Drone to start
-  register: health_check_result
-  shell: >-
-    docker run --net=container:{{ drone_worker_container_name }}
-    alpine/httpie --check-status http://{{ drone_worker_container_name }}:3000/healthz
-  retries: 30
-  delay: 1
-  until: health_check_result.rc == 0
