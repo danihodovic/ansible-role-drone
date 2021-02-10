@@ -1,0 +1,21 @@
+---
+- include_tasks: ./install_dependencies.yml
+
+- set_fact:
+    # yamllint disable-line rule:line-length
+    drone_web_container: '{{ drone_web_container_defaults | combine(drone_web_container) }}'
+
+- name: Deploy web
+  register: start_drone_container
+  # yamllint disable-line rule:line-length
+  docker_container: '{{ drone_web_container }}'
+
+- name: Wait for Drone to start
+  register: health_check_result
+  # yamllint disable rule:line-length
+  shell: >-
+    docker exec -it {{ drone_web_container.name }} sh -c
+    'apk add --no-cache httpie && http localhost$DRONE_SERVER_PORT/healthz --check-status --timeout=3'
+  retries: 10
+  delay: 1
+  until: health_check_result.rc == 0
